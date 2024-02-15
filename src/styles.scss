@@ -1,12 +1,14 @@
 html,
 body {
   height: 100%;
-}
 
+  --mdc-filled-text-field-focus-active-indicator-color: #a2c6d5;
+  --mdc-filled-text-field-focus-label-text-color: #a2c6d5;
+  --mdc-filled-text-field-container-color: #1b2f39;
+
+  --mdc-dialog-container-shape: 10px;
+}
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
-
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

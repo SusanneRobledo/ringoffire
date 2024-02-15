@@ -1,0 +1,21 @@
+.dialog-container {
+  background-color: #0c1a21;
+  border-radius: 10px;
+  h2,
+  p,
+  input {
+    color: white;
+  }
+}
+
+.mdc-dialog {
+  border-radius: 10px;
+}
+
+mat-label {
+  color: white;
+}
+
+mat-dialog-actions button {
+  color: white;
+}
