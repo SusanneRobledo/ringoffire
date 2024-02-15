@@ -15,17 +15,15 @@
 }
 
 .start-label-box {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 12%; //11vh
-  display: flex;
-  justify-content: center;
+  position: fixed;
+  top: 80%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 
   img {
-    max-width: 630px;
-    width: 52vw;
-    min-width: 400px;
+    max-width: 680px;
+    width: 58vw;
+    min-width: 330px;
     height: auto;
 
     &:hover {
