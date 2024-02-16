@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Game } from '../../models/game';
 import { PlayerComponent } from '../player/player.component';
@@ -8,6 +8,8 @@ import { DialogAddPlayerComponent } from '../dialog-add-player/dialog-add-player
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatDialog } from '@angular/material/dialog';
 import { GameInfoComponent } from '../game-info/game-info.component';
+import { Firestore, collection } from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-game',
@@ -28,7 +30,11 @@ export class GameComponent {
   currentCard: string = '';
   game!: Game; //Object hier verknüpft von Models > game.ts
 
+  firestore: Firestore = inject(Firestore);
+
   constructor(public dialog: MatDialog) {}
+
+  //const itemCollection = collection(this.firestore, 'items');
 
   ngOnInit(): void {
     this.newGame();
