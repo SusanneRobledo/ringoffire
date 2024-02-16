@@ -8,7 +8,13 @@ import { DialogAddPlayerComponent } from '../dialog-add-player/dialog-add-player
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatDialog } from '@angular/material/dialog';
 import { GameInfoComponent } from '../game-info/game-info.component';
-import { Firestore, collection } from '@angular/fire/firestore';
+import {
+  Firestore,
+  collection,
+  doc,
+  onSnapshot,
+  addDoc,
+} from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -32,12 +38,49 @@ export class GameComponent {
 
   firestore: Firestore = inject(Firestore);
 
-  constructor(public dialog: MatDialog) {}
+  unsubList;
+  unsubSingle;
 
-  //const itemCollection = collection(this.firestore, 'items');
+  constructor(public dialog: MatDialog) {
+    this.unsubList = onSnapshot(this.getGamesRef(), (list) => {
+      list.forEach((element) => {
+        console.log(element.data());
+      });
+    });
+
+    this.unsubSingle = onSnapshot(
+      this.getSingleGameRef('games', 'ZFiSGC3A2yweZ8EArAhc'),
+      (element) => {
+        console.log(element);
+      }
+    );
+  }
+
+  async addGame(item: Game) {
+    await addDoc(this.getGamesRef(), item)
+      .catch((err) => {
+        console.error(err);
+      })
+      .then((docRef) => {
+        console.log('Dokument written with ID:', docRef?.id);
+      });
+  }
+
+  ngOnDestroy() {
+    this.unsubList();
+    this.unsubSingle();
+  }
 
   ngOnInit(): void {
     this.newGame();
+  }
+
+  getGamesRef() {
+    return collection(this.firestore, 'games');
+  }
+
+  getSingleGameRef(colId: string, docId: string) {
+    return doc(collection(this.firestore, colId), docId);
   }
 
   newGame() {
