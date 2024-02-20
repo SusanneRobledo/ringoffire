@@ -57,13 +57,14 @@
 
 .player-position {
   position: absolute;
-  right: 0;
+  left: 0;
+  z-index: 1;
 }
 
 .btn-add {
   position: absolute;
   right: 32px;
-  bottom: 32px;
+  bottom: 52px;
 }
 
 .pin-bottom {

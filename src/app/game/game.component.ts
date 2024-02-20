@@ -34,8 +34,6 @@ import { Observable } from 'rxjs';
   styleUrl: './game.component.scss',
 })
 export class GameComponent {
-  takeCardAnimation = false;
-  currentCard: string = '';
   game!: Game; //Object hier verknüpft von Models > game.ts
   gameId: string = '';
 
@@ -64,6 +62,8 @@ export class GameComponent {
           this.game.stack = gameData.stack;
           this.game.playedCards = gameData.playedCards;
           this.game.currentPlayer = gameData.currentPlayer;
+          this.game.takeCardAnimation = gameData.takeCardAnimation;
+          this.game.currentCard = gameData.currentCard;
         }
       );
     });
@@ -84,7 +84,8 @@ export class GameComponent {
       stack: obj.stack || '',
       playedCards: obj.playedCards || '',
       currentPlayer: obj.currentPlayer || '',
-      game: obj.game || '',
+      takeCardAnimation: obj.takeCardAnimation || '',
+      currentCard: obj.currentCard || '',
     };
   }
 
@@ -105,22 +106,24 @@ export class GameComponent {
       stack: gameData.stack,
       playedCards: gameData.playedCards,
       currentPlayer: gameData.currentPlayer,
+      takeCardAnimation: gameData.takeCardAnimation,
+      currentCard: gameData.currentCard,
     });
   }
 
   takeCard() {
-    if (!this.takeCardAnimation) {
-      this.currentCard = this.game.stack.pop()!;
-      this.takeCardAnimation = true;
-      this.saveGame();
+    if (!this.game.takeCardAnimation) {
+      this.game.currentCard = this.game.stack.pop()!;
+      this.game.takeCardAnimation = true;
 
       this.game.currentPlayer++;
       this.game.currentPlayer =
         this.game.currentPlayer % this.game.players.length;
+      this.saveGame();
 
       setTimeout(() => {
-        this.game.playedCards.push(this.currentCard);
-        this.takeCardAnimation = false;
+        this.game.playedCards.push(this.game.currentCard);
+        this.game.takeCardAnimation = false;
         this.saveGame();
       }, 1000);
     }
