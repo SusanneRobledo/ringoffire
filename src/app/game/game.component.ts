@@ -45,17 +45,6 @@ export class GameComponent {
 
   constructor(private route: ActivatedRoute, public dialog: MatDialog) {}
 
-  // ADD GAME DATA TO THE FIRESTORE BACKEND
-  async addGame(game: Game) {
-    await addDoc(this.getGamesRef(), game.toJSON()) // collection = wohin? , param game = was?
-      .catch((err) => {
-        console.error(err);
-      })
-      .then((docRef) => {
-        console.log('Dokument written with ID:', docRef?.id);
-      });
-  }
-
   ngOnDestroy() {
     this.unsubSingleGame();
   }
@@ -70,7 +59,7 @@ export class GameComponent {
         this.getSingleGameRef('games', this.gameId),
         (game: any) => {
           console.log(this.game.toJSON());
-          let gameData = game.data();
+          const gameData = game.data();
           this.game.players = gameData.players;
           this.game.stack = gameData.stack;
           this.game.playedCards = gameData.playedCards;
@@ -99,17 +88,12 @@ export class GameComponent {
     };
   }
 
-  getGamesRef() {
-    return collection(this.firestore, 'games');
-  }
-
   getSingleGameRef(colId: string, gameId: string) {
     return doc(collection(this.firestore, colId), gameId);
   }
 
   newGame() {
     this.game = new Game();
-    //this.addGame(this.game);
   }
 
   // UPDATE GAME DATA TO THE FIRESTORE BACKEND
@@ -137,6 +121,7 @@ export class GameComponent {
       setTimeout(() => {
         this.game.playedCards.push(this.currentCard);
         this.takeCardAnimation = false;
+        //this.saveGame();
       }, 1000);
     }
   }
@@ -147,6 +132,7 @@ export class GameComponent {
     dialogRef.afterClosed().subscribe((name: string) => {
       if (name && name.length > 0) {
         this.game.players.push(name); // checkt im ersten Schritt: existiert die Variable?
+        //this.saveGame();
       }
     });
   }
