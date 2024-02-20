@@ -105,7 +105,6 @@ export class GameComponent {
       stack: gameData.stack,
       playedCards: gameData.playedCards,
       currentPlayer: gameData.currentPlayer,
-      currentCard: gameData.currentCard,
     });
   }
 
@@ -113,6 +112,7 @@ export class GameComponent {
     if (!this.takeCardAnimation) {
       this.currentCard = this.game.stack.pop()!;
       this.takeCardAnimation = true;
+      this.saveGame();
 
       this.game.currentPlayer++;
       this.game.currentPlayer =
@@ -121,7 +121,7 @@ export class GameComponent {
       setTimeout(() => {
         this.game.playedCards.push(this.currentCard);
         this.takeCardAnimation = false;
-        //this.saveGame();
+        this.saveGame();
       }, 1000);
     }
   }
@@ -132,7 +132,7 @@ export class GameComponent {
     dialogRef.afterClosed().subscribe((name: string) => {
       if (name && name.length > 0) {
         this.game.players.push(name); // checkt im ersten Schritt: existiert die Variable?
-        //this.saveGame();
+        this.saveGame();
       }
     });
   }
