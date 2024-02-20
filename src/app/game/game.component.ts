@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Game } from '../../models/game';
 import { PlayerComponent } from '../player/player.component';
@@ -14,6 +15,7 @@ import {
   doc,
   onSnapshot,
   addDoc,
+  updateDoc,
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 
@@ -35,29 +37,17 @@ export class GameComponent {
   takeCardAnimation = false;
   currentCard: string = '';
   game!: Game; //Object hier verknüpft von Models > game.ts
+  gameId: string = '';
 
   firestore: Firestore = inject(Firestore);
 
-  unsubList;
-  unsubSingle;
+  unsubSingleGame: any;
 
-  constructor(public dialog: MatDialog) {
-    this.unsubList = onSnapshot(this.getGamesRef(), (list) => {
-      list.forEach((element) => {
-        console.log(element.data());
-      });
-    });
+  constructor(private route: ActivatedRoute, public dialog: MatDialog) {}
 
-    this.unsubSingle = onSnapshot(
-      this.getSingleGameRef('games', 'ZFiSGC3A2yweZ8EArAhc'),
-      (element) => {
-        console.log(element);
-      }
-    );
-  }
-
-  async addGame(item: Game) {
-    await addDoc(this.getGamesRef(), item)
+  // ADD GAME DATA TO THE FIRESTORE BACKEND
+  async addGame(game: Game) {
+    await addDoc(this.getGamesRef(), game.toJSON()) // collection = wohin? , param game = was?
       .catch((err) => {
         console.error(err);
       })
@@ -67,24 +57,72 @@ export class GameComponent {
   }
 
   ngOnDestroy() {
-    this.unsubList();
-    this.unsubSingle();
+    this.unsubSingleGame();
   }
 
   ngOnInit(): void {
     this.newGame();
+    this.route.params.subscribe((params) => {
+      console.log(params['id']);
+      this.gameId = params['id'];
+      //READ DATA IN FIRESTORE BACKEND
+      this.unsubSingleGame = onSnapshot(
+        this.getSingleGameRef('games', this.gameId),
+        (game: any) => {
+          console.log(this.game.toJSON());
+          let gameData = game.data();
+          this.game.players = gameData.players;
+          this.game.stack = gameData.stack;
+          this.game.playedCards = gameData.playedCards;
+          this.game.currentPlayer = gameData.currentPlayer;
+        }
+      );
+    });
+  }
+
+  subGame() {
+    return onSnapshot(
+      this.getSingleGameRef('games', this.gameId),
+      (element) => {
+        console.log(element);
+      }
+    );
+  }
+
+  setGameObject(obj: any) {
+    return {
+      players: obj.players || '',
+      stack: obj.stack || '',
+      playedCards: obj.playedCards || '',
+      currentPlayer: obj.currentPlayer || '',
+      game: obj.game || '',
+    };
   }
 
   getGamesRef() {
     return collection(this.firestore, 'games');
   }
 
-  getSingleGameRef(colId: string, docId: string) {
-    return doc(collection(this.firestore, colId), docId);
+  getSingleGameRef(colId: string, gameId: string) {
+    return doc(collection(this.firestore, colId), gameId);
   }
 
   newGame() {
     this.game = new Game();
+    //this.addGame(this.game);
+  }
+
+  // UPDATE GAME DATA TO THE FIRESTORE BACKEND
+  async saveGame() {
+    const gameData: any = this.game.toJSON();
+    let docRef = this.getSingleGameRef('games', this.gameId);
+    await updateDoc(docRef, {
+      players: gameData.players,
+      stack: gameData.stack,
+      playedCards: gameData.playedCards,
+      currentPlayer: gameData.currentPlayer,
+      currentCard: gameData.currentCard,
+    });
   }
 
   takeCard() {
@@ -107,7 +145,9 @@ export class GameComponent {
     const dialogRef = this.dialog.open(DialogAddPlayerComponent);
 
     dialogRef.afterClosed().subscribe((name: string) => {
-      if (name && name.length > 0) this.game.players.push(name); // checkt im ersten Schritt: existiert die Variable?
+      if (name && name.length > 0) {
+        this.game.players.push(name); // checkt im ersten Schritt: existiert die Variable?
+      }
     });
   }
 }

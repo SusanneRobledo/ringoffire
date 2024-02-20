@@ -15,7 +15,17 @@ export class Game {
     shuffle(this.stack);
   }
 
-  public toJson() {
+  /* addGame() {
+    let game:Game = {
+      players: this.players,
+      stack: this.stack,
+      playedCards: this.playedCards,
+      currentPlayer: this.currentPlayer,
+    };
+    this.game.addGame(game);
+  } */
+
+  public toJSON() {
     return {
       players: this.players,
       stack: this.stack,
